@@ -1,0 +1,5 @@
+{
+  "name": "Entropy Wizard",
+  "description": "A PRNG analyzer and sequence predictor. Generate random sequences and analyze them with Gemini.",
+  "requestFramePermissions": []
+}
