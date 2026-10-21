@@ -32,17 +32,20 @@ const Analyzer: React.FC = () => {
   };
 
   const handleAnalyze = async () => {
-    if (validationError) return;
+    if (validationError || isLoading) return;
 
     const rawInput = inputSequence.trim();
     if (!rawInput) return;
 
-    const sequence = rawInput.split(',')
-      .map(s => parseFloat(s.trim()))
-      .filter(n => !isNaN(n));
+    const parts = rawInput.split(',').map(s => s.trim());
+    const sequence = parts.map(Number);
+    if (parts.some(s => !s) || sequence.some(n => !Number.isFinite(n))) {
+      setError('Please separate finite numbers with commas.');
+      return;
+    }
 
-    if (sequence.length < 3) {
-      setError("Please enter at least 3 valid numbers.");
+    if (sequence.length < 3 || sequence.length > 500) {
+      setError("Please enter 3 to 500 valid numbers.");
       return;
     }
 
@@ -58,7 +61,7 @@ const Analyzer: React.FC = () => {
         ...prev.slice(0, 9) // Keep last 10
       ]);
     } catch (err: any) {
-      setError(err.message || "Analysis failed. Please try again or check your API key.");
+      setError(err.message || "Analysis failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -99,6 +102,7 @@ const Analyzer: React.FC = () => {
         <div className="flex gap-2 mb-2 relative">
           <input 
             type="text" 
+            maxLength={18000}
             value={inputSequence}
             onChange={handleInputChange}
             onKeyDown={(e) => e.key === 'Enter' && !validationError && handleAnalyze()}
